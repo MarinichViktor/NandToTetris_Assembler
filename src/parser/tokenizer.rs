@@ -153,12 +153,17 @@ impl Tokenizer {
                 self.advance();
                 let mut command_buffer = String::new();
                 while self.char().is_alphabetic() || self.char().is_digit(10) || vec!['!', '+', '-', '~'].contains(&self.char()) {
-                    if self.char() == ' ' {
-                        self.advance();
-                    }
+                    // if self.char() == ' ' {
+                    //     self.advance();
+                    // }
 
                     command_buffer.push(self.char());
-                    self.advance();
+
+                    if self.has_next() {
+                        self.advance();
+                    } else {
+                        break;
+                    }
                 }
 
                 if is_jump_cmd {
@@ -213,11 +218,7 @@ impl Tokenizer {
     }
 
     fn char(&mut self) -> char {
-        if !self.has_next() {
-            panic!("Out of range");
-        }
-
-        self.raw[self.current_index]
+         self.raw[self.current_index]
     }
 
     fn advance(&mut self) {

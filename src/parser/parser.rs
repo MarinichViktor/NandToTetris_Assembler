@@ -1,6 +1,6 @@
 use crate::parser::tokenizer::{Token};
 use std::collections::HashMap;
-use crate::parser::tokenizer::Token::{Symbol, JumpSymbol};
+use crate::parser::tokenizer::Token::{Symbol, JumpSymbol, ACommandSymbol};
 use crate::parser::expression::{Expression, ExpressionType};
 
 pub struct Parser {
@@ -16,6 +16,9 @@ impl Parser {
 
     pub fn parse(&mut self, tokens: &Vec<Token>) -> Vec<Expression> {
         self.register_symbols(tokens);
+        // let sysinit = self.sym_table.get(String::from("OUTPUT_FIRST")).unwrap();
+        // println!("OUTPUT_FIRST {}", sysinit);
+
         let mut i = 0;
         let mut expressions: Vec<Expression> = vec![];
         while i < tokens.len() {
@@ -28,6 +31,8 @@ impl Parser {
                         });
                         i+=1;
                     } else {
+                        let h = self.sym_table.entries.contains_key(s);
+                        let symbol = s.clone();
                         panic!("Invalid symbol");
                     }
                 },
@@ -68,11 +73,23 @@ impl Parser {
     fn register_symbols(&mut self, tokens: &Vec<Token>) {
         for token in tokens {
             match token {
-                Symbol(x) => {
-                    self.sym_table.add(x.clone());
-                },
                 JumpSymbol(x, address) => {
-                    self.sym_table.set(x.clone(), *address);
+                    if !self.sym_table.entries.contains_key(x.as_str()) {
+                        self.sym_table.set(x.clone(), *address);
+                    } else {
+                        println!("****JumpSymbol already added");
+                    }
+                },
+                _ => {}
+            }
+        }
+
+        for token in tokens {
+            match token {
+                ACommandSymbol(x) => {
+                    if !self.sym_table.entries.contains_key(x.as_str()) {
+                        self.sym_table.add(x.clone());
+                    }
                 },
                 _ => {}
             }
