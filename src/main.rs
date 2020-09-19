@@ -2,13 +2,10 @@
 
 use std::io;
 use std::env;
-use std::str;
-use std::char;
 use std::fs::{File, OpenOptions};
-use std::io::{Read, BufReader, BufRead, ErrorKind, Error, BufWriter, Write};
+use std::io::{Read, BufReader, ErrorKind, Error, BufWriter, Write};
 use lib::parser::parser::{Parser};
 use lib::parser::tokenizer::Tokenizer;
-use std::ops::Add;
 use lib::parser::expression::Evaluate;
 
 fn main() -> io::Result<()> {
@@ -34,10 +31,10 @@ fn save_hack(data: String) {
     let args: Vec<String> = env::args().collect();
     let name = args.get(2).unwrap();
 
-    let mut file = OpenOptions::new().write(true).create(true).open(name).unwrap();
+    let file = OpenOptions::new().write(true).create(true).open(name).unwrap();
     {
-        let mut writer = std::io::BufWriter::new(file);
-        writer.write(data.as_bytes());
+        let mut writer = BufWriter::new(file);
+        writer.write(data.as_bytes()).unwrap();
     }
 }
 
@@ -51,7 +48,7 @@ fn load_asm() -> io::Result<Vec<u8>> {
 
     let mut buffer = vec![];
     let mut reader = BufReader::new(file);
-    reader.read_to_end(&mut buffer);
+    reader.read_to_end(&mut buffer).unwrap();
 
     Ok(buffer)
 }

@@ -1,8 +1,6 @@
-use crate::parser::tokenizer::{Token, OperationType};
+use crate::parser::tokenizer::{Token};
 use std::collections::HashMap;
 use crate::parser::tokenizer::Token::{Symbol, JumpSymbol};
-use std::borrow::Borrow;
-use std::str;
 use crate::parser::expression::{Expression, ExpressionType};
 
 pub struct Parser {
@@ -24,59 +22,43 @@ impl Parser {
             match tokens.get(i).unwrap() {
                 Token::ACommandSymbol(s) => {
                     if let Some(e) = self.sym_table.get(s.clone()) {
-                        let e = self.sym_table.get(s.clone()).unwrap();
                         expressions.push(Expression {
                             e_type: ExpressionType::ACommand,
                             tokens: vec![Token::ACommandLiteral(*e)]
                         });
                         i+=1;
                     } else {
-                        println!("symbol `{}`", s);
-                        let x = 123;
                         panic!("Invalid symbol");
                     }
                 },
                 Token::ACommandLiteral(e) => {
-                    expressions.push(Expression {
-                        e_type: ExpressionType::ACommand,
-                        tokens: vec![Token::ACommandLiteral(*e)]
-                    });
+                    expressions.push(Expression::new(ExpressionType::ACommand, vec![Token::ACommandLiteral(*e)]));
                     i+=1;
                 },
                 Token::Destination(s) => {
                     i+=1;
                     if let Token::CCommand(x) = tokens.get(i).unwrap() {
-                        expressions.push(Expression {
-                            e_type: ExpressionType::CCommand,
-                            tokens: vec![Token::Destination(s.clone()), Token::CCommand(x.clone())]
-                        });
+                        let expression = Expression::new(ExpressionType::CCommand, vec![Token::Destination(s.clone()), Token::CCommand(x.clone())]);
+                        expressions.push(expression);
                         i+=1;
                     } else {
                         panic!("CCommand should follow after Destination command")
                     }
                 },
-                // Were in jump
+                // We are in jump
                 Token::CCommand(x) => {
-                    let ccomand = x;
+                    let c_comand = x;
                     i+=1;
-                    if let Token::Jump(x) = tokens.get(i).unwrap() {
-                        expressions.push(Expression {
-                            e_type: ExpressionType::JCommand,
-                            tokens: vec![Token::CCommand(ccomand.clone()), Token::Jump(x.clone())]
-                        });
+                    if let Some(Token::Jump(x)) = tokens.get(i) {
+                        let expression = Expression::new(ExpressionType::JCommand, vec![Token::CCommand(c_comand.clone()), Token::Jump(x.clone())]);
+                        expressions.push(expression);
                         i+=1;
                     } else {
                         panic!("Jump should follow after CCcomand")
                     }
-
                 },
-                Token::InstructionEnd | Token::JumpSymbol(_, _) => {
-                    i+=1;
-                },
-                _ => {
-                    let t = tokens.get(i).unwrap();
-                    panic!("Unexpected token")
-                }
+                Token::InstructionEnd | Token::JumpSymbol(_, _) => i+=1,
+                _ => panic!("Unexpected token")
             }
         }
 

@@ -90,6 +90,15 @@ pub struct Expression {
     pub tokens: Vec<Token>
 }
 
+impl Expression {
+    pub fn new(e_type: ExpressionType, tokens: Vec<Token>) -> Expression {
+        Expression {
+            e_type,
+            tokens
+        }
+    }
+}
+
 pub trait Evaluate {
     fn evaluate(&self) -> String;
 }

@@ -1,11 +1,5 @@
 
-use std::error::Error;
-use std::borrow::Borrow;
-use std::thread::current;
 use std::str::FromStr;
-use crate::parser::tokenizer::Token::Operation;
-use crate::parser::tokenizer::JumpType::{JNG, JGT, JEQ, JGE, JLT, JNE, JLE, JMP, Null};
-use std::hash::Hash;
 
 lazy_static! {
     static ref ALLOWED_NAME_SYMBOLS: Vec<char> = vec!['.', '_', '$'];
@@ -234,13 +228,13 @@ impl Tokenizer {
         self.current_index += 1;
     }
 
-    fn release(&mut self) {
-        if !self.has_prev() {
-            panic!("Out of range");
-        }
-
-        self.current_index -= 1;
-    }
+    // fn release(&mut self) {
+    //     if !self.has_prev() {
+    //         panic!("Out of range");
+    //     }
+    //
+    //     self.current_index -= 1;
+    // }
 
     fn peek(&self) -> char {
         if !self.has_next() {
