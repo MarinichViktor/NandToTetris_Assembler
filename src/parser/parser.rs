@@ -1,6 +1,6 @@
 use crate::parser::tokenizer::{Token};
 use std::collections::HashMap;
-use crate::parser::tokenizer::Token::{Symbol, JumpSymbol, ACommandSymbol};
+use crate::parser::tokenizer::Token::{JumpSymbol, ACommandSymbol};
 use crate::parser::expression::{Expression, ExpressionType};
 
 pub struct Parser {

@@ -71,6 +71,12 @@ impl<'a> AsmCommandDescriptor<'_> {
     }
 
     pub fn into_hack(self) -> String {
+        if let Some(x) =  HACK_COMP_MAP.get(self.comp) {
+
+        } else {
+            let a = String::from(self.comp);
+            let b = 123;
+        }
         let raw_comp = HACK_COMP_MAP.get(self.comp).unwrap();
         let raw_dest = if let Some(x) = HACK_DEST_MAP.get(self.dest) { x } else {"000"};
         let raw_jump = HACK_JMP_MAP.get(self.jump).unwrap();

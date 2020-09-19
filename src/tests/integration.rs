@@ -29,25 +29,12 @@ fn test_compiler_for_rect_asm() {
     assert_eq!(compile(String::from(RECT_ASM)), RECT_HACK);
 }
 
-// #[test]
-// fn test_compiler_for_pongl_asm() {
-//     let hack: Vec<String> = PONGL_HACK.split('\n').map(|s| String::from(s)).collect();
-//
-//     compile(String::from(PONGL_ASM))
-//         .split('\n').enumerate().for_each(|(i, s)| {
-//             // assert_eq!(compile(String::from(PONG_ASM)), PONG_HACK);
-//             print!("index={} cmd={}", i, s);
-//             assert_eq!(s, hack.get(i).unwrap().as_str());
-//         });
-// }
+#[test]
+fn test_compiler_for_pongl_asm() {
+  assert_eq!(compile(String::from(PONGL_ASM)), PONGL_HACK);
+}
+
 #[test]
 fn test_compiler_for_pong_asm() {
-    let hack: Vec<String> = PONG_HACK.split('\n').map(|s| String::from(s)).collect();
-
-    compile(String::from(PONG_ASM))
-        .split('\n').enumerate().for_each(|(i, s)| {
-            // assert_eq!(compile(String::from(PONG_ASM)), PONG_HACK);
-            // println!("index={} cmd={}", i, s);
-            assert_eq!(s, hack.get(i).unwrap().as_str());
-        });
+    assert_eq!(compile(String::from(PONG_ASM)), PONG_HACK);
 }
