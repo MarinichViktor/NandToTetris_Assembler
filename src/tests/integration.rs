@@ -8,15 +8,7 @@ fn test_compiler_for_add_asm() {
 
 #[test]
 fn test_compiler_for_max_asm() {
-    // assert_eq!(compile(String::from(MAX_ASM)), MAX_HACK);
-    let hack: Vec<String> = MAX_HACK.split('\n').map(|s| String::from(s)).collect();
-
-    compile(String::from(MAX_ASM))
-        .split('\n').enumerate().for_each(|(i, s)| {
-            // assert_eq!(compile(String::from(PONG_ASM)), PONG_HACK);
-            println!("index={} cmd={}", i, s);
-            assert_eq!(s, hack.get(i).unwrap().as_str());
-        });
+    assert_eq!(compile(String::from(MAX_ASM)), MAX_HACK);
 }
 
 #[test]
