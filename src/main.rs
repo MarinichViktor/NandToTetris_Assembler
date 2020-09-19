@@ -6,9 +6,10 @@ use std::str;
 use std::char;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, BufReader, BufRead, ErrorKind, Error, BufWriter, Write};
-use lib::parser::parser::{Parser, Expression, Evaluate};
+use lib::parser::parser::{Parser};
 use lib::parser::tokenizer::Tokenizer;
 use std::ops::Add;
+use lib::parser::expression::Evaluate;
 
 fn main() -> io::Result<()> {
 
