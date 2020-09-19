@@ -87,29 +87,14 @@ pub struct Tokenizer {
     current_index: usize,
     line: u32
 }
-// let jump_token = match command_buffer.as_str() {
-//     "JNG" => JNG,
-//     "JGT" => JGT,
-//     "JEQ" => JEQ,
-//     "JGE" => JGE,
-//     "JLT" => JLT,
-//     "JNE" => JNE,
-//     "JLE" => JLE,
-//     "JMP" => JMP,
-//     _ => panic!("Parse error")
-// };
-
-
-// const ALLOWED_NAME_SYMBOLS: Vec<char> = vec!['.', '_', '$'];
-// const ALLOWED_OPERATIONS: Vec<char> = vec!['.', '_', '+'];
 
 impl Tokenizer {
     pub fn new() -> Tokenizer {
-        Tokenizer { raw: vec![], current_index: 0, line: 1 }
+        Tokenizer { raw: vec![], current_index: 0, line: 0 }
     }
 
     pub fn tokenize(&mut self, source: String) -> Vec<Token> {
-        self.raw = source.split("").into_iter()
+        self.raw = source.split("").filter(|s| *s != "" || *s != " ").into_iter()
             .filter(|s| !s.is_empty())
             .map(|s| char::from_str(s).unwrap()).collect();
         let mut tokens: Vec<Token> = vec![];
@@ -152,7 +137,7 @@ impl Tokenizer {
                 }
                 self.line +=1;
             },
-            c if c.is_alphabetic() => {
+            c if c.is_alphabetic() || c.is_digit(10) || ALLOWED_NAME_SYMBOLS.contains(&c) => {
                 let mut dest_buffer = String::new();
 
                 while self.has_next() && self.char() != ';' && self.char() != '=' {
@@ -169,7 +154,6 @@ impl Tokenizer {
                     return;
                 }
 
-                tokens.push(Token::Destination(dest_buffer));
 
                 let is_jump_cmd = self.char() == ';';
                 self.advance();
@@ -183,12 +167,13 @@ impl Tokenizer {
                     self.advance();
                 }
 
-                let result = if is_jump_cmd {
-                    Token::Jump(command_buffer)
+                if is_jump_cmd {
+                    tokens.push(Token::CCommand(dest_buffer));
+                    tokens.push(Token::Jump(command_buffer));
                 } else {
-                    Token::CCommand(command_buffer)
+                    tokens.push(Token::Destination(dest_buffer));
+                    tokens.push(Token::CCommand(command_buffer));
                 };
-                tokens.push(result);
                 self.line +=1;
             },
            ch if ch == '(' => {
@@ -227,150 +212,11 @@ impl Tokenizer {
         }
 
         if !comment_line {
-            self.line += 1;
             return Some(Token::InstructionEnd);
         }
 
         Option::None
     }
-
-    // fn parse_raw(&mut self) -> Option<Token> {
-    //     match self.char() {
-    //         ch if ch == '@' => Option::Some(Token::AAssignment),
-    //         // TODO revrite to handle as single Jump
-    //         ch if ch == ';' => Option::Some(Token::Semicolon),
-    //         ch if ch == '(' => {
-    //             let mut symbol = String::new();
-    //
-    //             while self.has_next() && self.peek() != ')' {
-    //                 self.advance();
-    //                 symbol.push(self.char());
-    //             }
-    //
-    //             if !self.has_next() || !self.peek() != ')' {
-    //                 panic!("GotoSymbol parsing exception");
-    //             }
-    //
-    //             Some(Token::JumpSymbol(symbol))
-    //         },
-    //         ch if (ch == 'A' || ch == 'D' || ch == 'M') && self.peek() == '=' => {
-    //
-    //         },
-    //
-    //
-    //         ch if ch == '-' || ch == '+' || ch == '=' => {
-    //             let op_type = match ch {
-    //                 '-' => OperationType::Subtract,
-    //                 '+' => OperationType::Add,
-    //                 '=' => OperationType::Assign,
-    //                 _ => panic!("Invalid operation")
-    //             };
-    //
-    //             Some(Token::Operation(op_type))
-    //         },
-    //         // TODO: handle A=D+1 as `A=` -> Token::Destination , `D+1` -> Token::Operation
-    //         ch if ch >= 'A' && ch <= 'Z' => {
-    //             // Handle dest
-    //             if self.has_next_idx(3) {
-    //                 let mut cmd = String::new();
-    //                 cmd.push(ch);
-    //                 cmd.push(self.peek());
-    //                 cmd.push(self.peek_idx(2));
-    //                 cmd.push(self.peek_idx(3));
-    //
-    //                 if jump_type != Null {
-    //                     self.advance();
-    //                     self.advance();
-    //                     // Reduce line by 1 to match next instruction
-    //                     self.line -= 1;
-    //                     return Some(Token::Jump(jump_type, self.line));
-    //                 }
-    //             }
-    //             // TODO: handle jump
-    //             if self.has_next_idx(2) {
-    //                 let mut cmd = String::new();
-    //                 cmd.push(ch);
-    //                 cmd.push(self.peek());
-    //                 cmd.push(self.peek_idx(2));
-    //
-    //                  let jump_type = match cmd.as_str() {
-    //                     "JNG" => JNG,
-    //                     "JGT" => JGT,
-    //                     "JEQ" => JEQ,
-    //                     "JGE" => JGE,
-    //                     "JLT" => JLT,
-    //                     "JNE" => JNE,
-    //                     "JLE" => JLE,
-    //                     "JMP" => JMP,
-    //                     _ => Null
-    //                 };
-    //
-    //                 if jump_type != Null {
-    //                     self.advance();
-    //                     self.advance();
-    //                     // Reduce line by 1 to match next instruction
-    //                     self.line -= 1;
-    //                     return Some(Token::Jump(jump_type, self.line));
-    //                 }
-    //             }
-    //
-    //             // TODO: handle variable
-    //             let mut variable = String::new();
-    //             variable.push(ch);
-    //             while self.has_next() && self.peek() >= 'A' && self.peek() <= 'Z'  {
-    //                 self.advance();
-    //                 variable.push(self.char());
-    //             }
-    //
-    //             let token = match variable.as_str() {
-    //                 "A" => Token::ARegister,
-    //                 "D" => Token::DRegister,
-    //                 "M" => Token::Memory,
-    //                 _ => Token::Symbol(variable)
-    //             };
-    //
-    //             Some(token)
-    //         },
-    //         ch if ch.is_digit(10) => {
-    //             let mut symbol = String::new();
-    //             symbol.push(ch);
-    //
-    //             while self.has_next() && self.peek().unwrap().is_digit(10) {
-    //                 self.advance();
-    //                 symbol.push(self.char());
-    //             }
-    //
-    //             Some(Token::Literal(symbol.parse::<i32>().unwrap()))
-    //         },
-    //         ch if ch == '/' && self.peek() == '/' => {
-    //             let comment_line = if self.has_prev() && self.prev() == '\n' {
-    //                 true
-    //             } else {
-    //                 false
-    //             };
-    //
-    //             self.advance();
-    //             while self.has_next() && self.char() != '\n' {
-    //                 self.advance();
-    //             }
-    //
-    //             if !comment_line {
-    //                 self.line += 1;
-    //                 return Some(Token::InstructionEnd);
-    //             }
-    //
-    //             Option::None
-    //         },
-    //         ch if ch == '\n' => {
-    //             self.line +=1;
-    //             Some(Token::InstructionEnd)
-    //         }
-    //         _ => {
-    //             println!("Token not matched {}", self.char());
-    //             Option::None
-    //         }
-    //     }
-    // }
 
     fn char(&mut self) -> char {
         if !self.has_next() {
