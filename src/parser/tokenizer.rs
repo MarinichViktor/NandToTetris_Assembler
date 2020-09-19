@@ -66,7 +66,7 @@ pub enum Token {
     Symbol(String),
     Variable(String),
     Operation(String),
-    JumpSymbol(String),
+    JumpSymbol(String, u32),
     AAssignment,
     Semicolon,
     ARegister,
@@ -150,21 +150,7 @@ impl Tokenizer {
                 if let Some(x) = self.process_a_command() {
                     tokens.push(x)
                 }
-
-                // let first_char = self.char();
-                // let mut buffer = String::new();
-                //
-                // while self.char().is_alphabetic() || self.char().is_digit(10) || ALLOWED_NAME_SYMBOLS.contains(&self.char()) {
-                //     buffer.push(self.char());
-                //     self.advance();
-                // }
-                //
-                // let token = if first_char.is_digit(10) {
-                //     let literal = u32::from_str(buffer.as_str()).unwrap();
-                //     Token::ACommandLiteral(literal)
-                // } else {
-                //     Token::ACommandSymbol(buffer)
-                // };
+                self.line +=1;
             },
             c if c.is_alphabetic() => {
                 let mut dest_buffer = String::new();
@@ -203,7 +189,21 @@ impl Tokenizer {
                     Token::CCommand(command_buffer)
                 };
                 tokens.push(result);
+                self.line +=1;
             },
+           ch if ch == '(' => {
+               let mut symbol = String::new();
+
+               while self.has_next() && self.peek() != ')' {
+                   self.advance();
+                   symbol.push(self.char());
+               }
+
+               if !self.has_next() || self.peek() != ')' {
+                   panic!("GotoSymbol parsing exception");
+               }
+               tokens.push(Token::JumpSymbol(symbol, self.line));
+           },
             ch if ch == '/' && self.peek() == '/' => {
                 if let Some(x) = self.process_comment() {
                     tokens.push(x);
