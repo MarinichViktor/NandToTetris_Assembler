@@ -1,1 +1,2 @@
-### Basic implementation of nand-tt hack assembler (in progress)
+## Basic  Assembler for hack ML (NandToTetris)  
+### Educational project for ch6
