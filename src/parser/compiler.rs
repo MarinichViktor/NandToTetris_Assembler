@@ -7,17 +7,12 @@ pub fn compile(source: String) -> String {
     let expressions = Parser::new().parse(&tokens);
     let mut buffer = String::new();
 
-    let mut i = 0;
     for expression in expressions {
         if buffer.len() > 0 {
             buffer.push_str("\n");
         }
         let res = expression.evaluate();
         buffer.push_str(res.as_str());
-        i+=1;
-        if i == 138 {
-            let a =1;
-        }
     }
     buffer
 }

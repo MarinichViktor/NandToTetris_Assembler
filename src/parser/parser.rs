@@ -16,8 +16,6 @@ impl Parser {
 
     pub fn parse(&mut self, tokens: &Vec<Token>) -> Vec<Expression> {
         self.register_symbols(tokens);
-        // let sysinit = self.sym_table.get(String::from("OUTPUT_FIRST")).unwrap();
-        // println!("OUTPUT_FIRST {}", sysinit);
 
         let mut i = 0;
         let mut expressions: Vec<Expression> = vec![];
@@ -31,8 +29,6 @@ impl Parser {
                         });
                         i+=1;
                     } else {
-                        let h = self.sym_table.entries.contains_key(s);
-                        let symbol = s.clone();
                         panic!("Invalid symbol");
                     }
                 },
@@ -47,10 +43,9 @@ impl Parser {
                         expressions.push(expression);
                         i+=1;
                     } else {
-                        panic!("CCommand should follow after Destination command")
+                        panic!("Unexpected token, expected c-command")
                     }
                 },
-                // We are in jump
                 Token::CCommand(x) => {
                     let c_comand = x;
                     i+=1;
@@ -59,7 +54,7 @@ impl Parser {
                         expressions.push(expression);
                         i+=1;
                     } else {
-                        panic!("Jump should follow after CCcomand")
+                        panic!("Unexpected token, expected jump command")
                     }
                 },
                 Token::InstructionEnd | Token::JumpSymbol(_, _) => i+=1,
@@ -71,13 +66,12 @@ impl Parser {
     }
 
     fn register_symbols(&mut self, tokens: &Vec<Token>) {
+        // TODO: refactor, remove x2 loops
         for token in tokens {
             match token {
                 JumpSymbol(x, address) => {
                     if !self.sym_table.entries.contains_key(x.as_str()) {
                         self.sym_table.set(x.clone(), *address);
-                    } else {
-                        println!("****JumpSymbol already added");
                     }
                 },
                 _ => {}
