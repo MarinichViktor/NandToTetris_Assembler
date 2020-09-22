@@ -1,2 +1,2 @@
-## Basic  Assembler for hack ML (NandToTetris)  
-### Educational project for ch6
+## Basic  Assembler for hack ML  
+### Educational project for ch6 (The Elements of Computing Systems: Building a Modern Computer from First Principles) 
